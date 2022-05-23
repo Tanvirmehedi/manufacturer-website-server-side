@@ -24,6 +24,9 @@ const run = async () => {
     const servicesCollection = client
       .db("toolify_database")
       .collection("services");
+    const productCollection = client
+      .db("toolify_database")
+      .collection("products");
     // --------------------------------------------------GET REQUEST SERVICES-----------
     app.get("/services", async (req, res) => {
       const query = {};
@@ -31,7 +34,20 @@ const run = async () => {
       const services = await cursor.toArray();
       res.send(services);
     });
-    //-----------------------------------------------------------------------
+    // --------------------------------------------------GET REQUEST SERVICES-----------
+
+    //--------------------------------Product Request ---------------------------------------
+    app.post("/product", async (req, res) => {
+      const product = req.body;
+      const query = { name: product.name };
+      const exists = await productCollection.findOne(query);
+      if (!product.name || exists) {
+        return res.send({ success: false, product: exists });
+      }
+      const result = await productCollection.insertOne(product);
+      res.send({ success: true, result });
+    });
+    //--------------------------------Product Request ---------------------------------------
   } finally {
   }
 };
