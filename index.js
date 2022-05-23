@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 //MeddleWare ----------------------------------------------------------
@@ -37,6 +37,15 @@ const run = async () => {
     // --------------------------------------------------GET REQUEST SERVICES-----------
 
     //--------------------------------Product Request ---------------------------------------
+    app.get("/products", async (req, res) => {
+      const query = {};
+      const sort = { _id: -1 };
+      const cursor = productCollection.find(query).limit(6).sort(sort);
+      const products = await cursor.toArray();
+      res.send(products);
+    });
+
+    // POST Request
     app.post("/product", async (req, res) => {
       const product = req.body;
       const query = { name: product.name };
