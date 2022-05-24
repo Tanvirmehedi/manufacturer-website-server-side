@@ -27,6 +27,7 @@ const run = async () => {
     const productCollection = client
       .db("toolify_database")
       .collection("products");
+    const userCollection = client.db("toolify_database").collection("users");
     // --------------------------------------------------GET REQUEST SERVICES-----------
     app.get("/services", async (req, res) => {
       const query = {};
@@ -57,6 +58,19 @@ const run = async () => {
       res.send({ success: true, result });
     });
     //--------------------------------Product Request ---------------------------------------
+    //--------------------------------User Request ---------------------------------------
+    app.put("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+    //--------------------------------User Request ---------------------------------------
   } finally {
   }
 };
