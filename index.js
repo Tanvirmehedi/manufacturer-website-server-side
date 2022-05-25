@@ -27,6 +27,7 @@ const client = new MongoClient(uri, {
 const run = async () => {
   try {
     await client.connect();
+    // COLLECTION INITIALIZATION
     const servicesCollection = client
       .db("toolify_database")
       .collection("services");
@@ -34,6 +35,9 @@ const run = async () => {
       .db("toolify_database")
       .collection("products");
     const userCollection = client.db("toolify_database").collection("users");
+    const purchaseCollection = client
+      .db("toolify_database")
+      .collection("purchase");
     // --------------------------------------------------GET REQUEST SERVICES-----------
     app.get("/services", async (req, res) => {
       const query = {};
@@ -59,8 +63,6 @@ const run = async () => {
       const cursor = productCollection.find(query);
       const product = await cursor.toArray();
       res.send(product);
-      // console.log(product);
-      // // res.send(products);
     });
 
     // POST Request
@@ -91,6 +93,14 @@ const run = async () => {
       res.send({ result, token });
     });
     //--------------------------------User Request ---------------------------------------
+
+    //--------------------------------Purchase Request ---------------------------------------
+    app.post("/purchase", async (req, res) => {
+      const purchase = req.body;
+      const result = await purchaseCollection.insertOne(purchase);
+      res.send(result);
+    });
+    //--------------------------------Purchase Request ---------------------------------------
   } finally {
   }
 };
