@@ -95,6 +95,15 @@ const run = async () => {
     //--------------------------------User Request ---------------------------------------
 
     //--------------------------------Purchase Request ---------------------------------------
+
+    app.get("/purchase", async (req, res) => {
+      const email = req.query.userEmail;
+      const query = { userEmail: email };
+      const purchase = await purchaseCollection.find(query).toArray();
+      res.send(purchase);
+    });
+
+    // ------------------------------------------------------------
     app.post("/purchase", async (req, res) => {
       const purchase = req.body;
       const result = await purchaseCollection.insertOne(purchase);
