@@ -1,8 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const app = express();
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const {
+  MongoClient,
+  ServerApiVersion,
+  ObjectId,
+  ObjectID,
+} = require("mongodb");
 const port = process.env.PORT || 5000;
 
 //MeddleWare ----------------------------------------------------------
@@ -46,6 +52,17 @@ const run = async () => {
       res.send(products);
     });
 
+    // --------------------------------------------
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const cursor = productCollection.find(query);
+      const product = await cursor.toArray();
+      res.send(product);
+      // console.log(product);
+      // // res.send(products);
+    });
+
     // POST Request
     app.post("/product", async (req, res) => {
       const product = req.body;
@@ -68,7 +85,10 @@ const run = async () => {
         $set: user,
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
-      res.send(result);
+      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, {
+        expiresIn: "1h",
+      });
+      res.send({ result, token });
     });
     //--------------------------------User Request ---------------------------------------
   } finally {
