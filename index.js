@@ -98,7 +98,7 @@ const run = async () => {
 
     //--------------------------------User Request ---------------------------------------
 
-    app.get("/allusers", async (req, res) => {
+    app.get("/allusers", verifyJWT, async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
