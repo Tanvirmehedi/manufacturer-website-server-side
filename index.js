@@ -113,7 +113,7 @@ const run = async () => {
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
       const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, {
-        expiresIn: "",
+        expiresIn: "10h",
       });
       res.send({ result, token });
     });
