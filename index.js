@@ -24,6 +24,21 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+const verifyJWT = (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ message: "UnAuthorize Access" });
+  }
+  const token = authorization.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden Access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
+
 const run = async () => {
   try {
     await client.connect();
@@ -38,7 +53,10 @@ const run = async () => {
     const purchaseCollection = client
       .db("toolify_database")
       .collection("purchase");
+    // COLLECTION INITIALIZATION
+
     // --------------------------------------------------GET REQUEST SERVICES-----------
+
     app.get("/services", async (req, res) => {
       const query = {};
       const cursor = servicesCollection.find(query);
@@ -77,7 +95,14 @@ const run = async () => {
       res.send({ success: true, result });
     });
     //--------------------------------Product Request ---------------------------------------
+
     //--------------------------------User Request ---------------------------------------
+
+    app.get("/allusers", async (req, res) => {
+      const users = await userCollection.find().toArray();
+      res.send(users);
+    });
+
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
@@ -96,11 +121,16 @@ const run = async () => {
 
     //--------------------------------Purchase Request ---------------------------------------
 
-    app.get("/purchase", async (req, res) => {
+    app.get("/purchase", verifyJWT, async (req, res) => {
       const email = req.query.userEmail;
-      const query = { userEmail: email };
-      const purchase = await purchaseCollection.find(query).toArray();
-      res.send(purchase);
+      const decodedEmail = req.decoded.email;
+      if (email === decodedEmail) {
+        const query = { userEmail: email };
+        const purchase = await purchaseCollection.find(query).toArray();
+        return res.send(purchase);
+      } else {
+        return res.status(403).send({ message: "forbidden access" });
+      }
     });
 
     // ------------------------------------------------------------
