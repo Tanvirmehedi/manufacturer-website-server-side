@@ -125,6 +125,19 @@ const run = async () => {
       res.send({ result, token });
     });
 
+    app.put("/user/info/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
     app.put("/user/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       const initiator = req.decoded.email;
