@@ -53,6 +53,7 @@ const run = async () => {
     const purchaseCollection = client
       .db("toolify_database")
       .collection("purchase");
+    const blogCollection = client.db("toolify_database").collection("blog");
     // COLLECTION INITIALIZATION
 
     // --------------------------------------------------GET REQUEST SERVICES-----------
@@ -64,6 +65,20 @@ const run = async () => {
       res.send(services);
     });
     // --------------------------------------------------GET REQUEST SERVICES-----------
+    // --------------------------------------------------GET REQUEST BLOG-----------
+    app.get("/blog", async (req, res) => {
+      const query = {};
+      const cursor = blogCollection.find(query);
+      const services = await cursor.toArray();
+      res.send(services);
+    });
+
+    app.post("/blog", async (req, res) => {
+      const blog = req.body;
+      const result = await blogCollection.insertOne(blog);
+      res.send(result);
+    });
+    // --------------------------------------------------GET REQUEST BLOG-----------
 
     //--------------------------------Product Request ---------------------------------------
     app.get("/products", async (req, res) => {
